@@ -1,0 +1,103 @@
+REP: 2018
+Title: Native tensor type backed with managed memory
+Author: Hemal Shah <hemals@nvidia.com>
+Status: Draft
+Type: Standards Track
+Content-Type: text/x-rst
+Created: 04-Jul-2025
+Post-History:
+
+Abstract
+========
+
+This REP proposes a new native type to represent tensors as a block of memory with a shape that can be optionally backed by an external memory manager.
+
+
+Motivation
+==========
+
+THE PROBLEM: Accelerator caches, need tensor to be a first-class native type as a successor to standard array types for DNN policy-driven robots.
+
+****
+-Embodied AI agents need tensors for policy-driven robots using DNN inference
+-NITROS solves this for CUDA, but need a more common way for developers to optionally pick up acceleration on the platform they are running on.
+****
+
+Terminology
+===========
+
+:ROS Message Type:
+  A ROS message type always refers to ROS messages, such as ``std_msgs/msg/String``.
+  This is the canonical string representation of a ROS message type, and represents the data sent over the ROS network.
+
+
+Specification
+=============
+
+rcl::Tensor
+		1. Introduction
+		2. Creation APIs
+		3. Manipulation APIs
+		4. Managed APIs
+	2. rclcpp, rclpy
+	3. IDL
+	4. RMW
+	5. rosbag serialization
+	6. rviz2 support
+	7. tensor_msgs::Image
+	8. Implementation swapping
+		1. Platform-specific creation APIs
+		2. One and only one platform-specific implementation as a time, like RMW implementation
+
+
+
+High-level Goals
+----------------
+
+- Provide a native way to represent tensors across all interfaces from client libraries through RMW implementations.
+- Make available a set of common operations on tensors that can be used by all interfaces.
+- Enable accelerated implementations of common tensor operations when available at runtime.
+- Enable accelerator memory management backing these tensors when when availale at runtime.
+- Optimize flow of tensors for deep neural network model inference to avoid unnecessary memory copies.
+- Allow for backwards compatibility with all non-accelerated platforms.
+
+
+
+
+Rationale
+=========
+
+
+
+Backwards Compatibility
+=======================
+
+The proposed feature adds new functionality while not modifying existing functionality.
+
+
+Feature Progress
+================
+
+
+
+References
+==========
+
+.. [1] REP 2007
+   (https://ros.org/reps/rep-2007.html)
+
+
+Copyright
+=========
+
+This document has been placed in the public domain.
+
+
+..
+   Local Variables:
+   mode: indented-text
+   indent-tabs-mode: nil
+   sentence-end-double-space: t
+   fill-column: 70
+   coding: utf-8
+   End:
