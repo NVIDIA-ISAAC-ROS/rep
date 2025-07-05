@@ -6,13 +6,15 @@ Type: Standards Track
 Content-Type: text/x-rst
 Created: 04-Jul-2025
 Post-History:
+ROS-Version: Lyrical Luth
 
+========
 Abstract
 ========
 
 This REP proposes a new native type to represent tensors as a block of memory with a shape that can be optionally backed by an external memory manager.
 
-
+==========
 Motivation
 ==========
 
@@ -23,6 +25,7 @@ THE PROBLEM: Accelerator caches, need tensor to be a first-class native type as 
 -NITROS solves this for CUDA, but need a more common way for developers to optionally pick up acceleration on the platform they are running on.
 ****
 
+===========
 Terminology
 ===========
 
@@ -30,36 +33,100 @@ Terminology
   A ROS message type always refers to ROS messages, such as ``std_msgs/msg/String``.
   This is the canonical string representation of a ROS message type, and represents the data sent over the ROS network.
 
+=============
+Requirements
+=============
 
+* Provide a native way to represent tensors across all interfaces from client libraries through RMW implementations.
+* Make available a set of common operations on tensors that can be used by all interfaces.
+* Enable accelerated implementations of common tensor operations when available at runtime.
+* Enable accelerator memory management backing these tensors when when availale at runtime.
+* Optimize flow of tensors for deep neural network model inference to avoid unnecessary memory copies.
+* Allow for backwards compatibility with all non-accelerated platforms.
+
+
+=============
 Specification
 =============
 
+-----------
 rcl::Tensor
-		1. Introduction
-		2. Creation APIs
-		3. Manipulation APIs
-		4. Managed APIs
-	2. rclcpp, rclpy
-	3. IDL
-	4. RMW
-	5. rosbag serialization
-	6. rviz2 support
-	7. tensor_msgs::Image
-	8. Implementation swapping
+-----------
+
+The objective of rcl::Tensor is to hide the details of the underlying memory management system from the user unless absolutely necessary.
+
+
+Definition
+==========
+
+.. code-block:: c
+
+struct rcl::Tensor
+{
+    std::vector<size_t> shape; // shape of the tensor
+    std::vector<size_t> strides; // strides of the tensor
+    void* data; // pointer to the data
+    size_t size; // size of the data
+    size_t itemsize; // size of the data type
+    size_t ndim; // number of dimensions
+    size_t nbytes; // size of the data in bytes
+    size_t nitems; // number of items in the data
+}
+.. code-block::
+
+APIs
+----
+
+Creation
+''''''''
+
+rcl_create()
+
+
+Common operations
+'''''''''''''''''
+
+reshape()
+squeeze()
+
+
+Managed access
+''''''''''''''
+
+apply()
+
+
+Direct access
+'''''''''''''
+
+rcl_tensor_data()
+
+
+Client library integration
+==========================
+
+rclcpp
+------
+
+Tensor class?
+1. rclcpp, rclpy
+	1. IDL
+	2. RMW
+	3. rosbag serialization
+	4. rviz2 support
+	5. tensor_msgs::Image
+
+
+
+----------------------------------
+Runtime accelerated implementation
+----------------------------------
+
+	1. Implementation swapping
 		1. Platform-specific creation APIs
 		2. One and only one platform-specific implementation as a time, like RMW implementation
 
 
-
-High-level Goals
-----------------
-
-- Provide a native way to represent tensors across all interfaces from client libraries through RMW implementations.
-- Make available a set of common operations on tensors that can be used by all interfaces.
-- Enable accelerated implementations of common tensor operations when available at runtime.
-- Enable accelerator memory management backing these tensors when when availale at runtime.
-- Optimize flow of tensors for deep neural network model inference to avoid unnecessary memory copies.
-- Allow for backwards compatibility with all non-accelerated platforms.
 
 
 
@@ -93,6 +160,7 @@ Copyright
 This document has been placed in the public domain.
 
 
+
 ..
    Local Variables:
    mode: indented-text
